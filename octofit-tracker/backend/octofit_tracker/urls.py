@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+import os
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
@@ -30,7 +31,11 @@ router.register(r'workouts', WorkoutViewSet)
 
 @api_view(['GET'])
 def api_root(request):
+    codespace_name = os.environ.get('CODESPACE_NAME', 'localhost')
+    base_url = f"https://{codespace_name}-8000.app.github.dev/api/"
     return Response({
+        'message': "Welcome to Octofit Tracker API",
+        'api_base_url': base_url,
         'users': request.build_absolute_uri('users/'),
         'teams': request.build_absolute_uri('teams/'),
         'activities': request.build_absolute_uri('activities/'),
@@ -40,6 +45,6 @@ def api_root(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', api_root, name='api_root'),
+    path('api/', api_root, name='api_root'),
     path('', include(router.urls)),
 ]
